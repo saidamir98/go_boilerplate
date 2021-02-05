@@ -1,0 +1,382 @@
+definitions:
+  config.Config:
+    properties:
+      app:
+        type: string
+      defaultLimit:
+        type: string
+      defaultOffset:
+        type: string
+      environment:
+        description: development, staging, production
+        type: string
+      httpport:
+        type: string
+      logLevel:
+        description: debug, info, warn, error, dpanic, panic, fatal
+        type: string
+      postgresDatabase:
+        type: string
+      postgresHost:
+        type: string
+      postgresPassword:
+        type: string
+      postgresPort:
+        type: integer
+      postgresUser:
+        type: string
+    type: object
+  models.Application:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.ApplicationCreated:
+    properties:
+      id:
+        type: string
+    type: object
+  models.ApplicationList:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/models.Application'
+        type: array
+      count:
+        type: integer
+    type: object
+  models.CreateApplication:
+    properties:
+      body:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      error:
+        type: object
+      message:
+        type: string
+    type: object
+  models.SuccessResponse:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  models.UpdateApplication:
+    properties:
+      body:
+        type: string
+    type: object
+info:
+  contact:
+    email: saidamir.botirov@gmail.com
+    name: Saidamir Botirov
+    url: https://www.linkedin.com/in/saidamir-botirov-a08559192
+  description: This is a Go Boilerplate for medium sized projects
+  title: Go Boilerplate API
+  version: "1.0"
+paths:
+  /config:
+    get:
+      consumes:
+      - application/json
+      description: shows config of the project only on the development phase
+      operationId: get-config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/config.Config'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: gets project config
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: this returns "pong" messsage to show service is working
+      operationId: ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: desc
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+      summary: returns "pong" message
+  /v1/application:
+    get:
+      consumes:
+      - application/json
+      description: gets application list
+      operationId: get-application-list
+      parameters:
+      - enum:
+        - asc
+        - desc
+        in: query
+        name: arrangement
+        type: string
+      - default: 10
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        in: query
+        name: offset
+        type: integer
+      - enum:
+        - id
+        - body
+        - created_at
+        - ' updated_at'
+        in: query
+        name: order
+        type: string
+      - in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ApplicationList'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: gets application list
+      tags:
+      - application
+    post:
+      consumes:
+      - application/json
+      description: creates an application
+      operationId: create-application
+      parameters:
+      - description: application body
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateApplication'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ApplicationCreated'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: creates an application
+      tags:
+      - application
+  /v1/application/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: deletes an application by its id
+      operationId: delete-application
+      parameters:
+      - description: application id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: deletes an application by its id
+      tags:
+      - application
+    get:
+      consumes:
+      - application/json
+      description: gets an application by its id
+      operationId: get-application-by-id
+      parameters:
+      - description: application id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Application'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: gets an application by its id
+      tags:
+      - application
+    put:
+      consumes:
+      - application/json
+      description: gets an application by its id
+      operationId: update-application
+      parameters:
+      - description: application id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: application body
+        in: body
+        name: application
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateApplication'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.SuccessResponse'
+            - properties:
+                data:
+                  type: integer
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "422":
+          description: Validation Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ErrorResponse'
+            - properties:
+                error:
+                  type: string
+              type: object
+        "500":
+          description: Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: gets an application by its id
+      tags:
+      - application
+swagger: "2.0"
