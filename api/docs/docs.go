@@ -561,6 +561,9 @@ var doc = `{
                 },
                 "postgresUser": {
                     "type": "string"
+                },
+                "rabbitURL": {
+                    "type": "string"
                 }
             }
         },

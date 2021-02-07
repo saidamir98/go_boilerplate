@@ -25,6 +25,8 @@ definitions:
         type: integer
       postgresUser:
         type: string
+      rabbitURL:
+        type: string
     type: object
   models.Application:
     properties:

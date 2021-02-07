@@ -544,6 +544,9 @@
                 },
                 "postgresUser": {
                     "type": "string"
+                },
+                "rabbitURL": {
+                    "type": "string"
                 }
             }
         },
