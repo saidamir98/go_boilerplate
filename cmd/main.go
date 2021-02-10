@@ -50,7 +50,7 @@ func main() {
 			log.Panic("error on the event server", logger.Error(err))
 			return
 		}
-		eventServer.RunConsumers(context.Background())
+		eventServer.RunConsumers(context.Background()) // should be some recovery
 		log.Panic("event server has finished")
 	}(&wg)
 

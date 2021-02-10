@@ -24,7 +24,7 @@ func NewRMQ(conn *amqp.Connection, log logger.Logger) (*RMQ, error) {
 		conn:           conn,
 		log:            log,
 		consumers:      make(map[string]*Consumer),
-		consumerErrors: make(chan error),
+		consumerErrors: make(chan error), // must be buffered size
 		publishers:     make(map[string]*Publisher),
 	}
 
@@ -38,13 +38,12 @@ func (rmq *RMQ) RunConsumers(ctx context.Context) {
 	var wg sync.WaitGroup
 
 	for _, consumer := range rmq.consumers {
-		c := consumer
 		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
+		go func(wg *sync.WaitGroup, c *Consumer) {
 			defer wg.Done()
 			c.Start(ctx)
-		}(&wg)
-		fmt.Println("Key:", c.queueName, "=>", "consumer:", c)
+		}(&wg, consumer)
+		fmt.Println("Key:", consumer.queueName, "=>", "consumer:", consumer)
 	}
 
 	wg.Wait()

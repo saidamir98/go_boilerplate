@@ -33,12 +33,12 @@ func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName st
 		return err
 	}
 
-	err = declareExchange(ch, exchangeName)
+	// err = declareExchange(ch, exchangeName)
 
-	if err != nil {
-		fmt.Printf("Exchange Declare: %s", err.Error())
-		return err
-	}
+	// if err != nil {
+	// 	fmt.Printf("Exchange Declare: %s", err.Error())
+	// 	return err
+	// }
 
 	q, err := declareQueue(ch, queueName)
 
@@ -58,28 +58,27 @@ func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName st
 		return err
 	}
 
-	messages, err := ch.Consume(
-		q.Name,
-		consumerName,
-		false,
-		false,
-		false,
-		true,
-		nil,
-	)
+	// messages, err := ch.Consume(
+	// 	queueName,
+	// 	consumerName,
+	// 	false,
+	// 	false,
+	// 	false,
+	// 	true,
+	// 	nil,
+	// )
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
 	rmq.consumers[consumerName] = &Consumer{
 		consumerName: consumerName,
 		channel:      ch,
 		exchangeName: exchangeName,
 		routingKey:   routingKey,
-		queueName:    q.Name,
+		queueName:    queueName,
 		handler:      handler,
-		messages:     messages,
 		errors:       rmq.consumerErrors,
 	}
 
@@ -88,19 +87,19 @@ func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName st
 
 // Start ...
 func (c *Consumer) Start(ctx context.Context) {
-	// var err error
-	// c.messages, err = c.channel.Consume(
-	// 	c.queueName,
-	// 	c.consumerName,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	true,
-	// 	nil)
-	// if err != nil {
-	// 	c.errors <- err
-	// 	return
-	// }
+	var err error
+	c.messages, err = c.channel.Consume(
+		c.queueName,
+		c.consumerName,
+		false,
+		false,
+		false,
+		true,
+		nil)
+	if err != nil {
+		c.errors <- err
+		return
+	}
 	for {
 		select {
 		case msg, ok := <-c.messages:

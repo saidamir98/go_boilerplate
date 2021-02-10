@@ -2,7 +2,6 @@ package event
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/streadway/amqp"
 )
@@ -37,12 +36,12 @@ func (rmq *RMQ) NewPublisher(publisherName, exchangeName string) error {
 		return err
 	}
 
-	err = declareExchange(ch, exchangeName)
+	// err = declareExchange(ch, exchangeName)
 
-	if err != nil {
-		fmt.Printf("Exchange Declare: %s", err.Error())
-		return err
-	}
+	// if err != nil {
+	// 	fmt.Printf("Exchange Declare: %s", err.Error())
+	// 	return err
+	// }
 
 	rmq.publishers[publisherName] = &Publisher{
 		channel:      ch,
