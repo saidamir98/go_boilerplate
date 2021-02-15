@@ -24,7 +24,7 @@ func NewRMQ(conn *amqp.Connection, log logger.Logger) (*RMQ, error) {
 		conn:           conn,
 		log:            log,
 		consumers:      make(map[string]*Consumer),
-		consumerErrors: make(chan error), // must be buffered size
+		consumerErrors: make(chan error, 10000), // must be buffered size
 		publishers:     make(map[string]*Publisher),
 	}
 
