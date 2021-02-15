@@ -7,8 +7,9 @@ import (
 	"go_boilerplate/config"
 	"go_boilerplate/events"
 	"go_boilerplate/pkg/logger"
-	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -45,60 +46,60 @@ func main() {
 		log.Panic("error connecting to rabbit", logger.Error(err))
 	}
 
-	var wg sync.WaitGroup
+	// var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		eventServer, err := events.New(cfg, log, db, amqpConn)
-		if err != nil {
-			log.Panic("error on the event server", logger.Error(err))
-			return
-		}
-		eventServer.RunConsumers(context.Background()) // should be some recovery
-		log.Panic("event server has finished")
-	}(&wg)
-
-	wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		defer wg.Done()
-		apiServer := api.New(cfg, log, db)
-		err := apiServer.Run(cfg.HTTPPort)
-		if err != nil {
-			log.Panic("error on the api server", logger.Error(err))
-			return
-		}
-		log.Panic("api server has finished")
-	}(&wg)
-
-	wg.Wait()
-
-	// group, ctx := errgroup.WithContext(context.Background())
-
-	// group.Go(func() error {
+	// wg.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	defer wg.Done()
 	// 	eventServer, err := events.New(cfg, log, db, amqpConn)
 	// 	if err != nil {
-	// 		return err
-	// 		// panic(err)
+	// 		log.Panic("error on the event server", logger.Error(err))
+	// 		return
 	// 	}
-	// 	eventServer.RunConsumers(ctx)
+	// 	eventServer.RunConsumers(context.Background()) // should be some recovery
 	// 	log.Panic("event server has finished")
-	// 	return nil
-	// })
+	// }(&wg)
 
-	// group.Go(func() error {
+	// wg.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	defer wg.Done()
 	// 	apiServer := api.New(cfg, log, db)
 	// 	err := apiServer.Run(cfg.HTTPPort)
 	// 	if err != nil {
-	// 		return err
-	// 		// panic(err)
+	// 		log.Panic("error on the api server", logger.Error(err))
+	// 		return
 	// 	}
 	// 	log.Panic("api server has finished")
-	// 	return nil
-	// })
+	// }(&wg)
 
-	// err = group.Wait()
-	// if err != nil {
-	// 	log.Panic("error on the server", logger.Error(err))
-	// }
+	// wg.Wait()
+
+	group, ctx := errgroup.WithContext(context.Background())
+
+	group.Go(func() error {
+		eventServer, err := events.New(cfg, log, db, amqpConn)
+		if err != nil {
+			// return err
+			panic(err)
+		}
+		eventServer.RunConsumers(ctx)
+		log.Panic("event server has finished")
+		return nil
+	})
+
+	group.Go(func() error {
+		apiServer := api.New(cfg, log, db)
+		err := apiServer.Run(cfg.HTTPPort)
+		if err != nil {
+			return err
+			// panic(err)
+		}
+		log.Panic("api server has finished")
+		return nil
+	})
+
+	err = group.Wait()
+	if err != nil {
+		log.Panic("error on the server", logger.Error(err))
+	}
 }
