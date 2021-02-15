@@ -95,6 +95,7 @@ func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res 
 	if err != nil {
 		return res, err
 	}
+	defer row.Close()
 	if row.Next() {
 		err = row.Scan(
 			&res.Count,
@@ -109,7 +110,7 @@ func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res 
 	if err != nil {
 		return res, err
 	}
-
+	defer rows.Close()
 	for rows.Next() {
 		var application models.Application
 		err = rows.Scan(
@@ -123,6 +124,7 @@ func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res 
 		}
 		res.Applications = append(res.Applications, application)
 	}
+
 	return res, nil
 }
 
@@ -141,6 +143,7 @@ func (r *applicationRepo) GetByID(id string) (res models.Application, err error)
 	if err != nil {
 		return res, err
 	}
+	defer row.Close()
 
 	if row.Next() {
 		err = row.Scan(

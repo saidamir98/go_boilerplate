@@ -8,6 +8,7 @@ import (
 	"go_boilerplate/events"
 	"go_boilerplate/pkg/logger"
 	"sync"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -33,6 +34,10 @@ func main() {
 	if err != nil {
 		log.Panic("error connecting to postgres", logger.Error(err))
 	}
+
+	db.SetMaxOpenConns(50)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
 
 	amqpConn, err := amqp.Dial(cfg.RabbitURL)
 
