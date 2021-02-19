@@ -562,7 +562,7 @@ var doc = `{
                 "postgresUser": {
                     "type": "string"
                 },
-                "RabbitURI": {
+                "rabbitURI": {
                     "type": "string"
                 }
             }

@@ -25,7 +25,7 @@ definitions:
         type: integer
       postgresUser:
         type: string
-      RabbitURI:
+      rabbitURI:
         type: string
     type: object
   models.Application:
