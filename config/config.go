@@ -26,7 +26,7 @@ type Config struct {
 	PostgresUser     string
 	PostgresPassword string
 
-	RabbitURL string
+	RabbitURI string
 }
 
 // Load ...
@@ -53,7 +53,7 @@ func Load() Config {
 	config.PostgresUser = cast.ToString(getOrReturnDefaultValue("POSTGRES_USER", "test"))
 	config.PostgresPassword = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", "test"))
 
-	config.RabbitURL = cast.ToString(getOrReturnDefaultValue("AMQP_URL", "amqp://guest:guest@localhost:5672"))
+	config.RabbitURI = cast.ToString(getOrReturnDefaultValue("AMQP_URI", "amqp://guest:guest@localhost:5672"))
 
 	return config
 }

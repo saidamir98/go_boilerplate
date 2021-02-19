@@ -13,7 +13,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/streadway/amqp"
 )
 
 func main() {
@@ -39,12 +38,6 @@ func main() {
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(25)
 	db.SetConnMaxLifetime(5 * time.Minute)
-
-	amqpConn, err := amqp.Dial(cfg.RabbitURL)
-
-	if err != nil {
-		log.Panic("error connecting to rabbit", logger.Error(err))
-	}
 
 	// var wg sync.WaitGroup
 
@@ -77,7 +70,7 @@ func main() {
 	group, ctx := errgroup.WithContext(context.Background())
 
 	group.Go(func() error {
-		eventServer, err := events.New(cfg, log, db, amqpConn)
+		eventServer, err := events.New(cfg, log, db, cfg.RabbitURI)
 		if err != nil {
 			// return err
 			panic(err)

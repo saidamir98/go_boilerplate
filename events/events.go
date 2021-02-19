@@ -12,8 +12,8 @@ import (
 )
 
 // New ...
-func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpConn *amqp.Connection) (*event.RMQ, error) {
-	rmq, err := event.NewRMQ(amqpConn, log)
+func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpURI string) (*event.RMQ, error) {
+	rmq, err := event.NewRMQ(amqpURI, log)
 	if err != nil {
 		return nil, err
 	}
