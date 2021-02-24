@@ -3,7 +3,7 @@ package postgres
 import (
 	"errors"
 	"fmt"
-	"go_boilerplate/api/models"
+	"go_boilerplate/go_boilerplate_modules/application_service"
 	"go_boilerplate/storage/repo"
 	"regexp"
 	"strings"
@@ -20,7 +20,7 @@ func NewApplicationRepo(db *sqlx.DB) repo.ApplicationStorageI {
 	return &applicationRepo{db: db}
 }
 
-func (r *applicationRepo) Create(entity models.CreateApplication) (res models.ApplicationCreated, err error) {
+func (r *applicationRepo) Create(entity application_service.CreateApplicationModel) (res application_service.ApplicationCreatedModel, err error) {
 	insertQuery := `INSERT INTO application (
 		id,
 		body
@@ -43,8 +43,8 @@ func (r *applicationRepo) Create(entity models.CreateApplication) (res models.Ap
 	return res, nil
 }
 
-func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res models.ApplicationList, err error) {
-	res.Applications = []models.Application{}
+func (r *applicationRepo) GetList(queryParam application_service.ApplicationQueryParamModel) (res application_service.ApplicationListModel, err error) {
+	res.Applications = []application_service.ApplicationModel{}
 	params := make(map[string]interface{})
 	query := `SELECT
 		id,
@@ -112,7 +112,7 @@ func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res 
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var application models.Application
+		var application application_service.ApplicationModel
 		err = rows.Scan(
 			&application.ID,
 			&application.Body,
@@ -128,7 +128,7 @@ func (r *applicationRepo) GetList(queryParam models.ApplicationQueryParam) (res 
 	return res, nil
 }
 
-func (r *applicationRepo) GetByID(id string) (res models.Application, err error) {
+func (r *applicationRepo) GetByID(id string) (res application_service.ApplicationModel, err error) {
 	query := `SELECT
 		id,
 		body,
@@ -162,7 +162,7 @@ func (r *applicationRepo) GetByID(id string) (res models.Application, err error)
 	return res, nil
 }
 
-func (r *applicationRepo) Update(entity models.UpdateApplication) (rowsAffected int64, err error) {
+func (r *applicationRepo) Update(entity application_service.UpdateApplicationModel) (rowsAffected int64, err error) {
 	query := `UPDATE application SET
 		body = :body,
 		updated_at = now()

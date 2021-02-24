@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"go_boilerplate/api/models"
 	"go_boilerplate/config"
+	"go_boilerplate/go_boilerplate_modules/response"
 	"go_boilerplate/pkg/logger"
 	"go_boilerplate/storage"
 	"strconv"
@@ -28,7 +28,7 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB) *Handler {
 }
 
 func (h *Handler) handleSuccessResponse(c *gin.Context, code int, message string, data interface{}) {
-	c.JSON(code, models.SuccessResponse{
+	c.JSON(code, response.SuccessModel{
 		Code:    code,
 		Message: message,
 		Data:    data,
@@ -37,7 +37,7 @@ func (h *Handler) handleSuccessResponse(c *gin.Context, code int, message string
 
 func (h *Handler) handleErrorResponse(c *gin.Context, code int, message string, err interface{}) {
 	h.log.Error(message, logger.Int("code", code), logger.Any("error", err))
-	c.JSON(code, models.ErrorResponse{
+	c.JSON(code, response.ErrorModel{
 		Code:    code,
 		Message: message,
 		Error:   err,

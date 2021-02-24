@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"go_boilerplate/api/models"
+	"go_boilerplate/go_boilerplate_modules/application_service"
 	"go_boilerplate/pkg/logger"
 	"go_boilerplate/pkg/util"
 
@@ -16,15 +16,15 @@ import (
 // @Summary creates an application
 // @Description creates an application
 // @Accept json
-// @Param application body models.CreateApplication true "application body"
+// @Param application body application_service.CreateApplicationModel true "application body"
 // @Produce json
-// @Success 201 {object} models.SuccessResponse{data=models.ApplicationCreated} "Success"
-// @Response 422 {object} models.ErrorResponse{error=string} "Validation Error"
-// @Response 400 {object} models.ErrorResponse "Bad Request"
-// @Failure 500 {object} models.ErrorResponse "Server Error"
+// @Success 201 {object} response.SuccessModel{data=application_service.ApplicationCreatedModel} "Success"
+// @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
+// @Response 400 {object} response.ErrorModel "Bad Request"
+// @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) CreateApplication(c *gin.Context) {
 	var (
-		entity models.CreateApplication
+		entity application_service.CreateApplicationModel
 	)
 
 	err := c.ShouldBindJSON(&entity)
@@ -68,14 +68,14 @@ func (h *Handler) CreateApplication(c *gin.Context) {
 // @Summary gets application list
 // @Description gets application list
 // @Accept json
-// @Param find query models.ApplicationQueryParam false "filters"
+// @Param find query application_service.ApplicationQueryParamModel false "filters"
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=models.ApplicationList} "Success"
-// @Response 400 {object} models.ErrorResponse "Bad Request"
-// @Failure 500 {object} models.ErrorResponse "Server Error"
+// @Success 200 {object} response.SuccessModel{data=application_service.ApplicationListModel} "Success"
+// @Response 400 {object} response.ErrorModel "Bad Request"
+// @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) GetApplicationList(c *gin.Context) {
 	var (
-		queryParam models.ApplicationQueryParam
+		queryParam application_service.ApplicationQueryParamModel
 		err        error
 	)
 
@@ -114,10 +114,10 @@ func (h *Handler) GetApplicationList(c *gin.Context) {
 // @Accept json
 // @Param id path string true "application id"
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=models.Application} "Success"
-// @Response 422 {object} models.ErrorResponse{error=string} "Validation Error"
-// @Response 400 {object} models.ErrorResponse "Bad Request"
-// @Failure 500 {object} models.ErrorResponse "Server Error"
+// @Success 200 {object} response.SuccessModel{data=application_service.ApplicationModel} "Success"
+// @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
+// @Response 400 {object} response.ErrorModel "Bad Request"
+// @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) GetApplicationByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -145,15 +145,15 @@ func (h *Handler) GetApplicationByID(c *gin.Context) {
 // @Description gets an application by its id
 // @Accept json
 // @Param id path string true "application id"
-// @Param application body models.UpdateApplication true "application body"
+// @Param application body application_service.UpdateApplicationModel true "application body"
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=int64} "Success"
-// @Response 422 {object} models.ErrorResponse{error=string} "Validation Error"
-// @Response 400 {object} models.ErrorResponse "Bad Request"
-// @Failure 500 {object} models.ErrorResponse "Server Error"
+// @Success 200 {object} response.SuccessModel{data=int64} "Success"
+// @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
+// @Response 400 {object} response.ErrorModel "Bad Request"
+// @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) UpdateApplication(c *gin.Context) {
 	var (
-		entity models.UpdateApplication
+		entity application_service.UpdateApplicationModel
 	)
 
 	err := c.ShouldBindJSON(&entity)
@@ -197,10 +197,10 @@ func (h *Handler) UpdateApplication(c *gin.Context) {
 // @Accept json
 // @Param id path string true "application id"
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=int64} "Success"
-// @Response 422 {object} models.ErrorResponse{error=string} "Validation Error"
-// @Response 400 {object} models.ErrorResponse "Bad Request"
-// @Failure 500 {object} models.ErrorResponse "Server Error"
+// @Success 200 {object} response.SuccessModel{data=int64} "Success"
+// @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
+// @Response 400 {object} response.ErrorModel "Bad Request"
+// @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) DeleteApplication(c *gin.Context) {
 	id := c.Param("id")
 

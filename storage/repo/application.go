@@ -1,12 +1,14 @@
 package repo
 
-import "go_boilerplate/api/models"
+import (
+	"go_boilerplate/go_boilerplate_modules/application_service"
+)
 
 // ApplicationStorageI ...
 type ApplicationStorageI interface {
-	Create(entity models.CreateApplication) (res models.ApplicationCreated, err error)
-	GetList(queryParam models.ApplicationQueryParam) (res models.ApplicationList, err error)
-	GetByID(id string) (res models.Application, err error)
-	Update(entity models.UpdateApplication) (rowsAffected int64, err error)
+	Create(entity application_service.CreateApplicationModel) (res application_service.ApplicationCreatedModel, err error)
+	GetList(queryParam application_service.ApplicationQueryParamModel) (res application_service.ApplicationListModel, err error)
+	GetByID(id string) (res application_service.ApplicationModel, err error)
+	Update(entity application_service.UpdateApplicationModel) (rowsAffected int64, err error)
 	Delete(id string) (rowsAffected int64, err error)
 }

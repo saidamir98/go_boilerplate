@@ -1,4 +1,39 @@
 definitions:
+  application_service.ApplicationCreatedModel:
+    properties:
+      id:
+        type: string
+    type: object
+  application_service.ApplicationListModel:
+    properties:
+      applications:
+        items:
+          $ref: '#/definitions/application_service.ApplicationModel'
+        type: array
+      count:
+        type: integer
+    type: object
+  application_service.ApplicationModel:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  application_service.CreateApplicationModel:
+    properties:
+      body:
+        type: string
+    type: object
+  application_service.UpdateApplicationModel:
+    properties:
+      body:
+        type: string
+    type: object
   config.Config:
     properties:
       app:
@@ -28,37 +63,7 @@ definitions:
       rabbitURI:
         type: string
     type: object
-  models.Application:
-    properties:
-      body:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  models.ApplicationCreated:
-    properties:
-      id:
-        type: string
-    type: object
-  models.ApplicationList:
-    properties:
-      applications:
-        items:
-          $ref: '#/definitions/models.Application'
-        type: array
-      count:
-        type: integer
-    type: object
-  models.CreateApplication:
-    properties:
-      body:
-        type: string
-    type: object
-  models.ErrorResponse:
+  response.ErrorModel:
     properties:
       code:
         type: integer
@@ -67,18 +72,13 @@ definitions:
       message:
         type: string
     type: object
-  models.SuccessResponse:
+  response.SuccessModel:
     properties:
       code:
         type: integer
       data:
         type: object
       message:
-        type: string
-    type: object
-  models.UpdateApplication:
-    properties:
-      body:
         type: string
     type: object
 info:
@@ -103,7 +103,7 @@ paths:
           description: desc
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
                   $ref: '#/definitions/config.Config'
@@ -112,7 +112,7 @@ paths:
           description: Bad Request
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -131,7 +131,7 @@ paths:
           description: desc
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
                   type: string
@@ -140,7 +140,7 @@ paths:
           description: Internal Server Error
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -185,19 +185,19 @@ paths:
           description: Success
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ApplicationList'
+                  $ref: '#/definitions/application_service.ApplicationListModel'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
         "500":
           description: Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
       summary: gets application list
       tags:
       - application
@@ -212,7 +212,7 @@ paths:
         name: application
         required: true
         schema:
-          $ref: '#/definitions/models.CreateApplication'
+          $ref: '#/definitions/application_service.CreateApplicationModel'
       produces:
       - application/json
       responses:
@@ -220,20 +220,20 @@ paths:
           description: Success
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ApplicationCreated'
+                  $ref: '#/definitions/application_service.ApplicationCreatedModel'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
         "422":
           description: Validation Error
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -241,7 +241,7 @@ paths:
         "500":
           description: Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
       summary: creates an application
       tags:
       - application
@@ -264,7 +264,7 @@ paths:
           description: Success
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
                   type: integer
@@ -272,12 +272,12 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
         "422":
           description: Validation Error
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -285,7 +285,7 @@ paths:
         "500":
           description: Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
       summary: deletes an application by its id
       tags:
       - application
@@ -307,20 +307,20 @@ paths:
           description: Success
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  $ref: '#/definitions/models.Application'
+                  $ref: '#/definitions/application_service.ApplicationModel'
               type: object
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
         "422":
           description: Validation Error
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -328,7 +328,7 @@ paths:
         "500":
           description: Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
       summary: gets an application by its id
       tags:
       - application
@@ -348,7 +348,7 @@ paths:
         name: application
         required: true
         schema:
-          $ref: '#/definitions/models.UpdateApplication'
+          $ref: '#/definitions/application_service.UpdateApplicationModel'
       produces:
       - application/json
       responses:
@@ -356,7 +356,7 @@ paths:
           description: Success
           schema:
             allOf:
-            - $ref: '#/definitions/models.SuccessResponse'
+            - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
                   type: integer
@@ -364,12 +364,12 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
         "422":
           description: Validation Error
           schema:
             allOf:
-            - $ref: '#/definitions/models.ErrorResponse'
+            - $ref: '#/definitions/response.ErrorModel'
             - properties:
                 error:
                   type: string
@@ -377,7 +377,7 @@ paths:
         "500":
           description: Server Error
           schema:
-            $ref: '#/definitions/models.ErrorResponse'
+            $ref: '#/definitions/response.ErrorModel'
       summary: gets an application by its id
       tags:
       - application
