@@ -55,18 +55,18 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpURI string) (*ev
 	applicationService := application.New(cfg, log, db)
 
 	rmq.AddConsumer(
-		"consumer.application.create", // consumerName
-		"exchange.application.v1",     // exchangeName
-		"queue.application.create",    // queueName
-		"application.create",          // routingKey
+		"go_boilerplate", // ConsumerName: {consuming service}
+		"application",     // ExchangeName: model => exchange sending only events or commands about application
+		"application.event.created",    // QueueName: {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
+		"application.event.created",          // routingKey:  {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
 		applicationService.CreateApplicationListener,
 	)
 
 	rmq.AddConsumer(
-		"consumer.application.update", // consumerName
-		"exchange.application.v1",     // exchangeName
-		"queue.application.update",    // queueName
-		"application.update",          // routingKey
+		"go_boilerplate", // ConsumerName: {consuming service}
+		"application",     // ExchangeName: model => exchange sending only events or commands about application
+		"application.event.updated",    // QueueName: {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
+		"application.event.updated",    // routingKey:  {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
 		applicationService.UpdateApplicationListener,
 	)
 
