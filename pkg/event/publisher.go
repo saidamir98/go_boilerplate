@@ -1,8 +1,6 @@
 package event
 
 import (
-	"errors"
-
 	"github.com/streadway/amqp"
 )
 
@@ -25,30 +23,24 @@ func (p *Publisher) Push(routingKey string, msg amqp.Publishing) error {
 }
 
 // NewPublisher ...
-func (rmq *RMQ) NewPublisher(publisherName, exchangeName string) error {
-	if rmq.publishers[publisherName] != nil {
-		return errors.New("publisher with the same name already exists: " + publisherName)
-	}
-
-	ch, err := rmq.conn.Channel()
+func NewPublisher(conn *amqp.Connection, exchangeName string) Publisher {
+	ch, err := conn.Channel()
 
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	// err = declareExchange(ch, exchangeName)
 
 	// if err != nil {
 	// 	fmt.Printf("Exchange Declare: %s", err.Error())
-	// 	return err
+	// 	panic(err)
 	// }
 
-	rmq.publishers[publisherName] = &Publisher{
+	return Publisher{
 		channel:      ch,
 		exchangeName: exchangeName,
 	}
-
-	return nil
 }
 
 // Close ...

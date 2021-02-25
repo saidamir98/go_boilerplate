@@ -3,7 +3,6 @@ package event
 import (
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/streadway/amqp"
@@ -16,34 +15,34 @@ type Consumer struct {
 	exchangeName string
 	routingKey   string
 	queueName    string
-	handler      func(amqp.Delivery) error
+	handler      func(amqp.Delivery) (amqp.Publishing, error)
 	messages     <-chan amqp.Delivery
 	errors       chan error
 }
 
-// NewConsumer ...
-func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName string, handler func(amqp.Delivery) error) error {
+// AddConsumer ...
+func (rmq *RMQ) AddConsumer(consumerName, exchangeName, queueName, routingKey string, handler func(amqp.Delivery) (amqp.Publishing, error)) {
 	if rmq.consumers[consumerName] != nil {
-		return errors.New("consumer with the same name already exists: " + consumerName)
+		panic(errors.New("consumer with the same name already exists: " + consumerName))
 	}
 
 	ch, err := rmq.conn.Channel()
 
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	// err = declareExchange(ch, exchangeName)
 
 	// if err != nil {
 	// 	fmt.Printf("Exchange Declare: %s", err.Error())
-	// 	return err
+	// 	panic(err)
 	// }
 
 	q, err := declareQueue(ch, queueName)
 
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	err = ch.QueueBind(
@@ -55,22 +54,22 @@ func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName st
 	)
 
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	// messages, err := ch.Consume(
-	// 	queueName,
-	// 	consumerName,
-	// 	false,
-	// 	false,
-	// 	false,
-	// 	true,
-	// 	nil,
-	// )
+	messages, err := ch.Consume(
+		queueName,
+		consumerName,
+		false,
+		false,
+		false,
+		true,
+		nil,
+	)
 
-	// if err != nil {
-	// 	return err
-	// }
+	if err != nil {
+		panic(err)
+	}
 
 	rmq.consumers[consumerName] = &Consumer{
 		consumerName: consumerName,
@@ -79,39 +78,42 @@ func (rmq *RMQ) NewConsumer(consumerName, exchangeName, routingKey, queueName st
 		routingKey:   routingKey,
 		queueName:    queueName,
 		handler:      handler,
+		messages:     messages,
 		errors:       rmq.consumerErrors,
 	}
 
-	return nil
+	return
 }
 
 // Start ...
 func (c *Consumer) Start(ctx context.Context) {
-	var err error
-	c.messages, err = c.channel.Consume(
-		c.queueName,
-		c.consumerName,
-		false,
-		false,
-		false,
-		true,
-		nil)
-	if err != nil {
-		c.errors <- err
-		return
-	}
+	// var err error
+	// c.messages, err = c.channel.Consume(
+	// 	c.queueName,
+	// 	c.consumerName,
+	// 	false,
+	// 	false,
+	// 	false,
+	// 	true,
+	// 	nil)
+	// if err != nil {
+	// 	c.errors <- err
+	// 	return
+	// }
 	for {
 		select {
 		case msg, ok := <-c.messages:
 			if !ok {
-				fmt.Println(c.queueName)
-				c.errors <- errors.New("error while reading consumer messages")
+				// c.errors <- errors.New("error while reading consumer messages")
 				time.Sleep(time.Duration(5000 * time.Millisecond))
 			} else {
-				fmt.Println("rmq -> msg ", msg)
-				err := c.handler(msg)
+				resp, err := c.handler(msg)
 				if err != nil {
 					c.errors <- err
+				} else {
+					// if msg.CorrelationId != "" {
+					c.pushReplay(msg.ReplyTo, resp)
+					// }
 				}
 			}
 		case <-ctx.Done():
@@ -124,4 +126,22 @@ func (c *Consumer) Start(ctx context.Context) {
 			}
 		}
 	}
+}
+
+// PushReplay ...
+func (c *Consumer) pushReplay(replyTo string, msg amqp.Publishing) {
+
+	err := c.channel.Publish(
+		c.exchangeName,
+		replyTo,
+		false,
+		false,
+		msg,
+	)
+
+	if err != nil {
+		c.errors <- err
+	}
+
+	return
 }

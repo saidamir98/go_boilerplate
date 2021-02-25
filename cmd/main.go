@@ -67,25 +67,28 @@ func main() {
 
 	// wg.Wait()
 
+	eventServer, err := events.New(cfg, log, db, cfg.RabbitURI)
+	if err != nil {
+		log.Panic("error on the event server", logger.Error(err))
+	}
+
+	apiServer, err := api.New(cfg, log, db)
+	if err != nil {
+		log.Panic("error on the api server", logger.Error(err))
+	}
+
 	group, ctx := errgroup.WithContext(context.Background())
 
 	group.Go(func() error {
-		eventServer, err := events.New(cfg, log, db, cfg.RabbitURI)
-		if err != nil {
-			// return err
-			panic(err)
-		}
-		eventServer.RunConsumers(ctx)
+		eventServer.RunConsumers(ctx) // it should run forever if there is any consumer
 		log.Panic("event server has finished")
 		return nil
 	})
 
 	group.Go(func() error {
-		apiServer := api.New(cfg, log, db)
-		err := apiServer.Run(cfg.HTTPPort)
+		err := apiServer.Run(cfg.HTTPPort) // this method will block the calling goroutine indefinitely unless an error happens
 		if err != nil {
-			return err
-			// panic(err)
+			panic(err)
 		}
 		log.Panic("api server has finished")
 		return nil

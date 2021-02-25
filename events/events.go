@@ -1,12 +1,16 @@
 package events
 
 import (
-	"errors"
+	"encoding/json"
 	"fmt"
 	"go_boilerplate/config"
+	"go_boilerplate/events/application"
+	"go_boilerplate/go_boilerplate_modules/application_service"
 	"go_boilerplate/pkg/event"
 	"go_boilerplate/pkg/logger"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/streadway/amqp"
 )
@@ -18,42 +22,53 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpURI string) (*ev
 		return nil, err
 	}
 
-	err = rmq.NewConsumer("#####.create", "#####", "#####.create", "#####.create", func(delivery amqp.Delivery) error {
-		fmt.Println("celebrity.create")
-		fmt.Println(delivery)
+	go func() {
+		time.Sleep(time.Second * 7)
+		conn, err := amqp.Dial(amqpURI)
+		if err != nil {
+			fmt.Println(err)
+		}
+		publisher := event.NewPublisher(conn, "exchange.application.v1")
 
-		return errors.New("some error")
-	})
-	if err != nil {
-		return nil, err
-	}
+		for i := 0; i < 1000; i++ {
+			uuid, _ := uuid.NewRandom()
+			entity := application_service.CreateApplicationModel{
+				ID:   uuid.String(),
+				Body: fmt.Sprint(i),
+			}
 
-	err = rmq.NewConsumer("#####.update", "#####", "#####.update", "#####.update", func(delivery amqp.Delivery) error {
-		fmt.Println("celebrity.update")
-		fmt.Println(delivery)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+			b, err := json.Marshal(entity)
 
-	// err = rmq.NewConsumer("#####.update", "#####", "#####.update", "#####.update", func(delivery amqp.Delivery) error {
-	// 	fmt.Println("celebrity.update")
-	// 	fmt.Println(delivery)
-	// 	return nil
-	// })
-	// if err != nil {
-	// 	return nil, err
-	// }
+			err = publisher.Push("application.create", amqp.Publishing{
+				ReplyTo:       "application.update",
+				CorrelationId: fmt.Sprint(i),
+				Body:          b,
+			})
+			if err != nil {
+				fmt.Println(err)
+			}
+			time.Sleep(time.Second * 1)
+		}
 
-	err = rmq.NewConsumer("#####.delete", "#####", "#####.delete", "#####.delete", func(delivery amqp.Delivery) error {
-		fmt.Println("celebrity.delete")
-		fmt.Println(delivery)
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
+	}()
+
+	applicationService := application.New(cfg, log, db)
+
+	rmq.AddConsumer(
+		"consumer.application.create", // consumerName
+		"exchange.application.v1",     // exchangeName
+		"queue.application.create",    // queueName
+		"application.create",          // routingKey
+		applicationService.CreateApplicationListener,
+	)
+
+	rmq.AddConsumer(
+		"consumer.application.update", // consumerName
+		"exchange.application.v1",     // exchangeName
+		"queue.application.update",    // queueName
+		"application.update",          // routingKey
+		applicationService.UpdateApplicationListener,
+	)
 
 	fmt.Println(rmq)
 
