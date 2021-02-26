@@ -1,4 +1,4 @@
-package event
+package pubsub
 
 import (
 	"context"
@@ -17,6 +17,7 @@ type RMQ struct {
 	connErr        chan *amqp.Error
 	consumers      map[string]*Consumer
 	consumerErrors chan error
+	publishers     map[string]*Publisher
 }
 
 // NewRMQ ...
@@ -33,6 +34,7 @@ func NewRMQ(amqpURI string, log logger.Logger) (*RMQ, error) {
 		connErr:        make(chan *amqp.Error),
 		consumers:      make(map[string]*Consumer),
 		consumerErrors: make(chan error, 10000), // must be buffered size
+		publishers:     make(map[string]*Publisher),
 	}
 
 	rmq.conn.NotifyClose(rmq.connErr)

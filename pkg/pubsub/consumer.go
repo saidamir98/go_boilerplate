@@ -1,4 +1,4 @@
-package event
+package pubsub
 
 import (
 	"context"
@@ -15,13 +15,13 @@ type Consumer struct {
 	exchangeName string
 	routingKey   string
 	queueName    string
-	handler      func(amqp.Delivery) (amqp.Publishing, error)
+	handler      func(amqp.Delivery) error
 	messages     <-chan amqp.Delivery
 	errors       chan error
 }
 
 // AddConsumer ...
-func (rmq *RMQ) AddConsumer(consumerName, exchangeName, queueName, routingKey string, handler func(amqp.Delivery) (amqp.Publishing, error)) {
+func (rmq *RMQ) AddConsumer(consumerName, exchangeName, queueName, routingKey string, handler func(amqp.Delivery) error) {
 	if rmq.consumers[consumerName] != nil {
 		panic(errors.New("consumer with the same name already exists: " + consumerName))
 	}
@@ -105,16 +105,17 @@ func (c *Consumer) Start(ctx context.Context) {
 		case msg, ok := <-c.messages:
 			if !ok {
 				// c.errors <- errors.New("error while reading consumer messages")
-				time.Sleep(time.Duration(5000 * time.Millisecond))
+				time.Sleep(time.Duration(5 * time.Second))
 			} else {
-				resp, err := c.handler(msg)
+				err := c.handler(msg)
 				if err != nil {
 					c.errors <- err
-				} else {
-					// if msg.CorrelationId != "" {
-					c.pushReplay(msg.ReplyTo, resp)
-					// }
 				}
+				// else {
+				// 	// if msg.CorrelationId != "" {
+				// 	c.pushReplay(msg.ReplyTo, resp)
+				// 	// }
+				// }
 			}
 		case <-ctx.Done():
 			{
@@ -128,20 +129,20 @@ func (c *Consumer) Start(ctx context.Context) {
 	}
 }
 
-// PushReplay ...
-func (c *Consumer) pushReplay(replyTo string, msg amqp.Publishing) {
+// // PushReplay ...
+// func (c *Consumer) pushReplay(replyTo string, msg amqp.Publishing) {
 
-	err := c.channel.Publish(
-		c.exchangeName,
-		replyTo,
-		false,
-		false,
-		msg,
-	)
+// 	err := c.channel.Publish(
+// 		c.exchangeName,
+// 		replyTo,
+// 		false,
+// 		false,
+// 		msg,
+// 	)
 
-	if err != nil {
-		c.errors <- err
-	}
+// 	if err != nil {
+// 		c.errors <- err
+// 	}
 
-	return
-}
+// 	return
+// }

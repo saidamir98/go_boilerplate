@@ -67,7 +67,7 @@ func main() {
 
 	// wg.Wait()
 
-	eventServer, err := events.New(cfg, log, db, cfg.RabbitURI)
+	pubsubServer, err := events.New(cfg, log, db)
 	if err != nil {
 		log.Panic("error on the event server", logger.Error(err))
 	}
@@ -80,7 +80,7 @@ func main() {
 	group, ctx := errgroup.WithContext(context.Background())
 
 	group.Go(func() error {
-		eventServer.RunConsumers(ctx) // it should run forever if there is any consumer
+		pubsubServer.Run(ctx) // it should run forever if there is any consumer
 		log.Panic("event server has finished")
 		return nil
 	})

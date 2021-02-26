@@ -9,19 +9,17 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// CreateApplicationListener ...
-func (s *Application) CreateApplicationListener(delivery amqp.Delivery) (resp amqp.Publishing, err error) {
+// createApplicationListener ...
+func (s *Application) createApplicationListener(delivery amqp.Delivery) error {
 	var (
 		entity application_service.CreateApplicationModel
 	)
 
-	resp.CorrelationId = delivery.CorrelationId
-
-	err = json.Unmarshal(delivery.Body, &entity)
+	err := json.Unmarshal(delivery.Body, &entity)
 	if err != nil {
 		s.log.Error("unmarshal error", logger.Any("[]byte", delivery.Body), logger.Any("error", err))
 		delivery.Nack(false, false)
-		return
+		return err
 	}
 
 	fmt.Println(entity)
@@ -30,49 +28,49 @@ func (s *Application) CreateApplicationListener(delivery amqp.Delivery) (resp am
 	if err != nil {
 		s.log.Error("storage error", logger.Any("entity", entity), logger.Any("error", err))
 		delivery.Nack(false, false)
-		return
+		return err
 	}
 
-	resp.Body, err = json.Marshal(res)
+	b, err := json.Marshal(res)
 	if err != nil {
 		s.log.Error("marshal error", logger.Any("struct", res), logger.Any("error", err))
 		delivery.Nack(false, false)
-		return
+		return err
+	}
+
+	resp := amqp.Publishing{
+		ContentType:   "application/json",
+		DeliveryMode:  amqp.Persistent,
+		CorrelationId: delivery.CorrelationId,
+		Body:          b,
+	}
+
+	err = s.rmq.Push("application", delivery.ReplyTo, resp)
+	if err != nil {
+		s.log.Error("publish error", logger.Any("resp", resp), logger.Any("error", err))
+		delivery.Nack(false, false)
+		return err
 	}
 
 	delivery.Ack(false)
-	return
+	return nil
 }
 
-// UpdateApplicationListener ...
-func (s *Application) UpdateApplicationListener(delivery amqp.Delivery) (resp amqp.Publishing, err error) {
+// applicationCreatedListener ...
+func (s *Application) applicationCreatedListener(delivery amqp.Delivery) error {
 	var (
-		entity application_service.CreateApplicationModel
+		entity application_service.ApplicationCreatedModel
 	)
 
-	resp = amqp.Publishing{
-		CorrelationId: delivery.CorrelationId,
-	}
-
-	err = json.Unmarshal(delivery.Body, &entity)
+	err := json.Unmarshal(delivery.Body, &entity)
 	if err != nil {
 		s.log.Error("unmarshal error", logger.Any("[]byte", delivery.Body), logger.Any("error", err))
 		delivery.Nack(false, false)
+		return err
 	}
 
-	fmt.Println("---------->")
 	fmt.Println(entity)
-	fmt.Println("----------<")
 
-	// res, err := s.storagePostgres.Application().Create(entity)
-
-	// resp.Body, err = json.Marshal(res)
-	// if err != nil {
-	// 	s.log.Error("marshal error", logger.Any("struct", res), logger.Any("error", err))
-	// 	delivery.Nack(false, false)
-	// 	return
-	// }
-
-	delivery.Nack(false, false)
-	return
+	delivery.Ack(false)
+	return nil
 }

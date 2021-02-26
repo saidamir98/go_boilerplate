@@ -1,13 +1,14 @@
 package events
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"go_boilerplate/config"
 	"go_boilerplate/events/application"
 	"go_boilerplate/go_boilerplate_modules/application_service"
-	"go_boilerplate/pkg/event"
 	"go_boilerplate/pkg/logger"
+	"go_boilerplate/pkg/pubsub"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,21 +16,26 @@ import (
 	"github.com/streadway/amqp"
 )
 
+// PubsubServer ...
+type PubsubServer struct {
+	cfg config.Config
+	log logger.Logger
+	db  *sqlx.DB
+	rmq *pubsub.RMQ
+}
+
 // New ...
-func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpURI string) (*event.RMQ, error) {
-	rmq, err := event.NewRMQ(amqpURI, log)
+func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*PubsubServer, error) {
+	rmq, err := pubsub.NewRMQ(cfg.RabbitURI, log)
 	if err != nil {
 		return nil, err
 	}
 
-	go func() {
-		time.Sleep(time.Second * 7)
-		conn, err := amqp.Dial(amqpURI)
-		if err != nil {
-			fmt.Println(err)
-		}
-		publisher := event.NewPublisher(conn, "exchange.application.v1")
+	rmq.AddPublisher("application")
 
+	// test publisher ------------>
+	go func() {
+		time.Sleep(time.Millisecond * 3000)
 		for i := 0; i < 1000; i++ {
 			uuid, _ := uuid.NewRandom()
 			entity := application_service.CreateApplicationModel{
@@ -39,38 +45,36 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB, amqpURI string) (*ev
 
 			b, err := json.Marshal(entity)
 
-			err = publisher.Push("application.create", amqp.Publishing{
-				ReplyTo:       "application.update",
+			fmt.Println("---------------------------------------------------------------------")
+			err = rmq.Push("application", "application.create", amqp.Publishing{
+				ContentType:   "application/json",
+				DeliveryMode:  amqp.Persistent,
+				ReplyTo:       "application.created",
 				CorrelationId: fmt.Sprint(i),
 				Body:          b,
 			})
+
 			if err != nil {
 				fmt.Println(err)
 			}
-			time.Sleep(time.Second * 1)
+
+			time.Sleep(time.Millisecond * 1000)
 		}
-
 	}()
+	// <----------
 
-	applicationService := application.New(cfg, log, db)
+	return &PubsubServer{
+		cfg: cfg,
+		log: log,
+		db:  db,
+		rmq: rmq,
+	}, nil
+}
 
-	rmq.AddConsumer(
-		"consumer.application.create", // consumerName
-		"exchange.application.v1",     // exchangeName
-		"queue.application.create",    // queueName
-		"application.create",          // routingKey
-		applicationService.CreateApplicationListener,
-	)
+// Run ...
+func (s *PubsubServer) Run(ctx context.Context) {
+	applicationServer := application.New(s.cfg, s.log, s.db, s.rmq)
+	applicationServer.RegisterConsumers()
 
-	rmq.AddConsumer(
-		"consumer.application.update", // consumerName
-		"exchange.application.v1",     // exchangeName
-		"queue.application.update",    // queueName
-		"application.update",          // routingKey
-		applicationService.UpdateApplicationListener,
-	)
-
-	fmt.Println(rmq)
-
-	return rmq, err
+	s.rmq.RunConsumers(ctx)
 }

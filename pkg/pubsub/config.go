@@ -1,4 +1,4 @@
-package event
+package pubsub
 
 import "github.com/streadway/amqp"
 
