@@ -38,18 +38,20 @@ func (s *Application) createApplicationListener(delivery amqp.Delivery) error {
 		return err
 	}
 
-	resp := amqp.Publishing{
-		ContentType:   "application/json",
-		DeliveryMode:  amqp.Persistent,
-		CorrelationId: delivery.CorrelationId,
-		Body:          b,
-	}
+	if len(delivery.ReplyTo) > 0 && len(delivery.CorrelationId) > 0 {
+		resp := amqp.Publishing{
+			ContentType:   "application/json",
+			DeliveryMode:  amqp.Persistent,
+			CorrelationId: delivery.CorrelationId,
+			Body:          b,
+		}
 
-	err = s.rmq.Push("application", delivery.ReplyTo, resp)
-	if err != nil {
-		s.log.Error("publish error", logger.Any("resp", resp), logger.Any("error", err))
-		delivery.Nack(false, false)
-		return err
+		err = s.rmq.Push("application", delivery.ReplyTo, resp)
+		if err != nil {
+			s.log.Error("publish error", logger.Any("resp", resp), logger.Any("error", err))
+			delivery.Nack(false, false)
+			return err
+		}
 	}
 
 	delivery.Ack(false)
