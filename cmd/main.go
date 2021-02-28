@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go_boilerplate/api"
+	"go_boilerplate/api/docs"
 	"go_boilerplate/config"
 	"go_boilerplate/events"
 	"go_boilerplate/pkg/logger"
@@ -19,6 +20,10 @@ func main() {
 	cfg := config.Load()
 
 	log := logger.New(cfg.App, cfg.LogLevel)
+
+	docs.SwaggerInfo.Host = cfg.ServiceHost + cfg.HTTPPort
+	docs.SwaggerInfo.BasePath = cfg.BasePath
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	psqlConnString := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
