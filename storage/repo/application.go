@@ -10,5 +10,5 @@ type ApplicationStorageI interface {
 	GetList(queryParam application_service.ApplicationQueryParamModel) (res application_service.ApplicationListModel, err error)
 	GetByID(id string) (res application_service.ApplicationModel, err error)
 	Update(entity application_service.UpdateApplicationModel) (rowsAffected int64, err error)
-	Delete(id string) (rowsAffected int64, err error)
+	Delete(entity application_service.DeleteApplicationModel) (rowsAffected int64, err error)
 }

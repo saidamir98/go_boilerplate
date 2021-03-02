@@ -187,10 +187,10 @@ func (r *applicationRepo) Update(entity application_service.UpdateApplicationMod
 	return rowsAffected, err
 }
 
-func (r *applicationRepo) Delete(id string) (rowsAffected int64, err error) {
+func (r *applicationRepo) Delete(entity application_service.DeleteApplicationModel) (rowsAffected int64, err error) {
 	query := `DELETE FROM application WHERE id = $1`
 
-	result, err := r.db.Exec(query, id)
+	result, err := r.db.Exec(query, entity.ID)
 	if err != nil {
 		return 0, err
 	}

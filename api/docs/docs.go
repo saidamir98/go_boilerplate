@@ -409,7 +409,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "$ref": "#/definitions/application_service.ApplicationUpdatedModel"
                                         }
                                     }
                                 }
@@ -482,7 +482,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "$ref": "#/definitions/application_service.DeleteApplicationModel"
                                         }
                                     }
                                 }
@@ -563,10 +563,29 @@ var doc = `{
                 }
             }
         },
+        "application_service.ApplicationUpdatedModel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "application_service.CreateApplicationModel": {
             "type": "object",
             "properties": {
                 "body": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.DeleteApplicationModel": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }

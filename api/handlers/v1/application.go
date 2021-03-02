@@ -1,12 +1,13 @@
 package v1
 
 import (
+	"encoding/json"
 	"go_boilerplate/go_boilerplate_modules/application_service"
-	"go_boilerplate/pkg/logger"
 	"go_boilerplate/pkg/util"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/streadway/amqp"
 )
 
 // CreateApplication godoc
@@ -48,16 +49,22 @@ func (h *Handler) CreateApplication(c *gin.Context) {
 
 	entity.ID = uuid.String()
 
-	res, err := h.storagePostgres.Application().Create(entity)
+	b, err := json.Marshal(entity)
+
+	err = h.rmq.Push("application", "application.create", amqp.Publishing{
+		ContentType:   "application/json",
+		DeliveryMode:  amqp.Persistent,
+		ReplyTo:       "application.created", // it is used for replaying result of the event
+		CorrelationId: entity.ID,
+		Body:          b,
+	})
 
 	if err != nil {
-		h.handleErrorResponse(c, 400, "bad request", err)
+		h.handleErrorResponse(c, 500, "server error", err)
 		return
 	}
 
-	h.log.Info("application has been created", logger.Any("body", entity), logger.Any("result", res))
-
-	h.handleSuccessResponse(c, 201, "application has been created", res)
+	h.handleSuccessResponse(c, 201, "application is being created", entity)
 	return
 }
 
@@ -147,7 +154,7 @@ func (h *Handler) GetApplicationByID(c *gin.Context) {
 // @Param id path string true "application id"
 // @Param application body application_service.UpdateApplicationModel true "application body"
 // @Produce json
-// @Success 200 {object} response.SuccessModel{data=int64} "Success"
+// @Success 200 {object} response.SuccessModel{data=application_service.ApplicationUpdatedModel} "Success"
 // @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
 // @Response 400 {object} response.ErrorModel "Bad Request"
 // @Failure 500 {object} response.ErrorModel "Server Error"
@@ -168,23 +175,28 @@ func (h *Handler) UpdateApplication(c *gin.Context) {
 		return
 	}
 
-	id := c.Param("id")
+	entity.ID = c.Param("id")
 
-	if !util.IsValidUUID(id) {
+	if !util.IsValidUUID(entity.ID) {
 		h.handleErrorResponse(c, 422, "validation error", "id")
 		return
 	}
 
-	entity.ID = id
+	b, err := json.Marshal(entity)
 
-	rowsAffected, err := h.storagePostgres.Application().Update(entity)
+	err = h.rmq.Push("application", "application.update", amqp.Publishing{
+		ContentType:   "application/json",
+		DeliveryMode:  amqp.Persistent,
+		CorrelationId: entity.ID,
+		Body:          b,
+	})
 
 	if err != nil {
-		h.handleErrorResponse(c, 400, "bad request", err)
+		h.handleErrorResponse(c, 500, "server error", err)
 		return
 	}
 
-	h.handleSuccessResponse(c, 200, "application has been updated", rowsAffected)
+	h.handleSuccessResponse(c, 200, "application is being updated", entity)
 	return
 }
 
@@ -197,29 +209,36 @@ func (h *Handler) UpdateApplication(c *gin.Context) {
 // @Accept json
 // @Param id path string true "application id"
 // @Produce json
-// @Success 200 {object} response.SuccessModel{data=int64} "Success"
+// @Success 200 {object} response.SuccessModel{data=application_service.DeleteApplicationModel} "Success"
 // @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
 // @Response 400 {object} response.ErrorModel "Bad Request"
 // @Failure 500 {object} response.ErrorModel "Server Error"
 func (h *Handler) DeleteApplication(c *gin.Context) {
-	id := c.Param("id")
+	var (
+		entity application_service.DeleteApplicationModel
+	)
 
-	if !util.IsValidUUID(id) {
+	entity.ID = c.Param("id")
+
+	if !util.IsValidUUID(entity.ID) {
 		h.handleErrorResponse(c, 422, "validation error", "id")
 		return
 	}
 
-	rowsAffected, err := h.storagePostgres.Application().Delete(id)
+	b, err := json.Marshal(entity)
+
+	err = h.rmq.Push("application", "application.delete", amqp.Publishing{
+		ContentType:   "application/json",
+		DeliveryMode:  amqp.Persistent,
+		CorrelationId: entity.ID,
+		Body:          b,
+	})
 
 	if err != nil {
-		h.handleErrorResponse(c, 400, "bad request", err)
+		h.handleErrorResponse(c, 500, "server error", err)
 		return
 	}
 
-	if rowsAffected == 1 {
-		h.log.Info("application has been deleted", logger.String("id", id))
-	}
-
-	h.handleSuccessResponse(c, 200, "application has been deleted", rowsAffected)
+	h.handleSuccessResponse(c, 200, "application is being deleted", entity)
 	return
 }

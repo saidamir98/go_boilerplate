@@ -4,6 +4,7 @@ import (
 	"go_boilerplate/config"
 	"go_boilerplate/go_boilerplate_modules/response"
 	"go_boilerplate/pkg/logger"
+	"go_boilerplate/pkg/pubsub"
 	"go_boilerplate/storage"
 	"strconv"
 
@@ -16,14 +17,16 @@ type Handler struct {
 	cfg             config.Config
 	log             logger.Logger
 	storagePostgres storage.PostgresStorageI
+	rmq             *pubsub.RMQ
 }
 
 // New ...
-func New(cfg config.Config, log logger.Logger, db *sqlx.DB) *Handler {
+func New(cfg config.Config, log logger.Logger, db *sqlx.DB, rmq *pubsub.RMQ) *Handler {
 	return &Handler{
 		cfg:             cfg,
 		log:             log,
 		storagePostgres: storage.NewStoragePostgres(db),
+		rmq:             rmq,
 	}
 }
 
