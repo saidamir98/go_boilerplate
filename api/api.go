@@ -21,7 +21,7 @@ import (
 // @contact.name Saidamir Botirov
 // @contact.email saidamir.botirov@gmail.com
 // @contact.url https://www.linkedin.com/in/saidamir-botirov-a08559192
-func New(cfg config.Config, log logger.Logger, db *sqlx.DB) *gin.Engine {
+func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*gin.Engine, error) {
 	if cfg.Environment != "development" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -49,5 +49,5 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB) *gin.Engine {
 		rv1.DELETE("/application/:id", handlerV1.DeleteApplication)
 	}
 
-	return router
+	return router, nil
 }

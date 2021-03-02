@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"go_boilerplate/api/models"
+	"go_boilerplate/go_boilerplate_modules/response"
 	"go_boilerplate/pkg/logger"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +14,10 @@ import (
 // @Description this returns "pong" messsage to show service is working
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=string} "desc"
-// @Failure 500 {object} models.ErrorResponse{error=string}
+// @Success 200 {object} response.SuccessModel{data=string} "desc"
+// @Failure 500 {object} response.ErrorModel{error=string}
 func (h *Handler) Ping(c *gin.Context) {
-	c.JSON(200, models.SuccessResponse{
+	c.JSON(200, response.SuccessModel{
 		Code:    200,
 		Message: "ok",
 		Data:    "pong",
@@ -32,8 +32,8 @@ func (h *Handler) Ping(c *gin.Context) {
 // @Description shows config of the project only on the development phase
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.SuccessResponse{data=config.Config} "desc"
-// @Response 400 {object} models.ErrorResponse{error=string} "Bad Request"
+// @Success 200 {object} response.SuccessModel{data=config.Config} "desc"
+// @Response 400 {object} response.ErrorModel{error=string} "Bad Request"
 func (h *Handler) GetConfig(c *gin.Context) {
 	h.log.Info("get config", logger.Any("result", h.cfg))
 	switch h.cfg.Environment {

@@ -45,7 +45,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
@@ -63,7 +63,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -96,7 +96,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
@@ -114,7 +114,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -189,13 +189,13 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.ApplicationList"
+                                            "$ref": "#/definitions/application_service.ApplicationListModel"
                                         }
                                     }
                                 }
@@ -205,13 +205,13 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     },
                     "500": {
                         "description": "Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     }
                 }
@@ -236,7 +236,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.CreateApplication"
+                            "$ref": "#/definitions/application_service.CreateApplicationModel"
                         }
                     }
                 ],
@@ -246,13 +246,13 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.ApplicationCreated"
+                                            "$ref": "#/definitions/application_service.ApplicationCreatedModel"
                                         }
                                     }
                                 }
@@ -262,7 +262,7 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     },
                     "422": {
@@ -270,7 +270,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -286,7 +286,7 @@ var doc = `{
                     "500": {
                         "description": "Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     }
                 }
@@ -321,13 +321,13 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.Application"
+                                            "$ref": "#/definitions/application_service.ApplicationModel"
                                         }
                                     }
                                 }
@@ -337,7 +337,7 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     },
                     "422": {
@@ -345,7 +345,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -361,7 +361,7 @@ var doc = `{
                     "500": {
                         "description": "Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     }
                 }
@@ -393,7 +393,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.UpdateApplication"
+                            "$ref": "#/definitions/application_service.UpdateApplicationModel"
                         }
                     }
                 ],
@@ -403,7 +403,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
@@ -419,7 +419,7 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     },
                     "422": {
@@ -427,7 +427,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -443,7 +443,7 @@ var doc = `{
                     "500": {
                         "description": "Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     }
                 }
@@ -476,7 +476,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.SuccessResponse"
+                                    "$ref": "#/definitions/response.SuccessModel"
                                 },
                                 {
                                     "type": "object",
@@ -492,7 +492,7 @@ var doc = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     },
                     "422": {
@@ -500,7 +500,7 @@ var doc = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/models.ErrorResponse"
+                                    "$ref": "#/definitions/response.ErrorModel"
                                 },
                                 {
                                     "type": "object",
@@ -516,7 +516,7 @@ var doc = `{
                     "500": {
                         "description": "Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.ErrorResponse"
+                            "$ref": "#/definitions/response.ErrorModel"
                         }
                     }
                 }
@@ -524,6 +524,61 @@ var doc = `{
         }
     },
     "definitions": {
+        "application_service.ApplicationCreatedModel": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.ApplicationListModel": {
+            "type": "object",
+            "properties": {
+                "applications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/application_service.ApplicationModel"
+                    }
+                },
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "application_service.ApplicationModel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.CreateApplicationModel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.UpdateApplicationModel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                }
+            }
+        },
         "config.Config": {
             "type": "object",
             "properties": {
@@ -561,57 +616,13 @@ var doc = `{
                 },
                 "postgresUser": {
                     "type": "string"
-                }
-            }
-        },
-        "models.Application": {
-            "type": "object",
-            "properties": {
-                "body": {
-                    "type": "string"
                 },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "updated_at": {
+                "rabbitURI": {
                     "type": "string"
                 }
             }
         },
-        "models.ApplicationCreated": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ApplicationList": {
-            "type": "object",
-            "properties": {
-                "applications": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Application"
-                    }
-                },
-                "count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.CreateApplication": {
-            "type": "object",
-            "properties": {
-                "body": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.ErrorResponse": {
+        "response.ErrorModel": {
             "type": "object",
             "properties": {
                 "code": {
@@ -625,7 +636,7 @@ var doc = `{
                 }
             }
         },
-        "models.SuccessResponse": {
+        "response.SuccessModel": {
             "type": "object",
             "properties": {
                 "code": {
@@ -635,14 +646,6 @@ var doc = `{
                     "type": "object"
                 },
                 "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.UpdateApplication": {
-            "type": "object",
-            "properties": {
-                "body": {
                     "type": "string"
                 }
             }

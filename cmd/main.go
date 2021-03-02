@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"go_boilerplate/api"
 	"go_boilerplate/config"
+	"go_boilerplate/events"
 	"go_boilerplate/pkg/logger"
+	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -30,7 +35,67 @@ func main() {
 		log.Panic("error connecting to postgres", logger.Error(err))
 	}
 
-	apiServer := api.New(cfg, log, db)
+	db.SetMaxOpenConns(50)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
 
-	apiServer.Run(cfg.HTTPPort)
+	// var wg sync.WaitGroup
+
+	// wg.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	defer wg.Done()
+	// 	eventServer, err := events.New(cfg, log, db, amqpConn)
+	// 	if err != nil {
+	// 		log.Panic("error on the event server", logger.Error(err))
+	// 		return
+	// 	}
+	// 	eventServer.RunConsumers(context.Background()) // should be some recovery
+	// 	log.Panic("event server has finished")
+	// }(&wg)
+
+	// wg.Add(1)
+	// go func(wg *sync.WaitGroup) {
+	// 	defer wg.Done()
+	// 	apiServer := api.New(cfg, log, db)
+	// 	err := apiServer.Run(cfg.HTTPPort)
+	// 	if err != nil {
+	// 		log.Panic("error on the api server", logger.Error(err))
+	// 		return
+	// 	}
+	// 	log.Panic("api server has finished")
+	// }(&wg)
+
+	// wg.Wait()
+
+	eventServer, err := events.New(cfg, log, db, cfg.RabbitURI)
+	if err != nil {
+		log.Panic("error on the event server", logger.Error(err))
+	}
+
+	apiServer, err := api.New(cfg, log, db)
+	if err != nil {
+		log.Panic("error on the api server", logger.Error(err))
+	}
+
+	group, ctx := errgroup.WithContext(context.Background())
+
+	group.Go(func() error {
+		eventServer.RunConsumers(ctx) // it should run forever if there is any consumer
+		log.Panic("event server has finished")
+		return nil
+	})
+
+	group.Go(func() error {
+		err := apiServer.Run(cfg.HTTPPort) // this method will block the calling goroutine indefinitely unless an error happens
+		if err != nil {
+			panic(err)
+		}
+		log.Panic("api server has finished")
+		return nil
+	})
+
+	err = group.Wait()
+	if err != nil {
+		log.Panic("error on the server", logger.Error(err))
+	}
 }
