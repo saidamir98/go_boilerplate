@@ -10,6 +10,6 @@ run:
 
 install:
 	swag init -g api/api.go -o api/docs
-	go get -u ./...
+	go mod download
 	go mod vendor
 	go run cmd/main.go
