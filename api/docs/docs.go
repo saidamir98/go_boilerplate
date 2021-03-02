@@ -409,7 +409,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/application_service.UpdateApplicationModel"
+                                            "$ref": "#/definitions/application_service.ApplicationUpdatedModel"
                                         }
                                     }
                                 }
@@ -559,6 +559,17 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.ApplicationUpdatedModel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 }
             }

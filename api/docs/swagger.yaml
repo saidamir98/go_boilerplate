@@ -24,6 +24,13 @@ definitions:
       updated_at:
         type: string
     type: object
+  application_service.ApplicationUpdatedModel:
+    properties:
+      body:
+        type: string
+      id:
+        type: string
+    type: object
   application_service.CreateApplicationModel:
     properties:
       body:
@@ -364,7 +371,7 @@ paths:
             - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  $ref: '#/definitions/application_service.UpdateApplicationModel'
+                  $ref: '#/definitions/application_service.ApplicationUpdatedModel'
               type: object
         "400":
           description: Bad Request

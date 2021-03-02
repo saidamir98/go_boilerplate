@@ -154,7 +154,7 @@ func (h *Handler) GetApplicationByID(c *gin.Context) {
 // @Param id path string true "application id"
 // @Param application body application_service.UpdateApplicationModel true "application body"
 // @Produce json
-// @Success 200 {object} response.SuccessModel{data=application_service.UpdateApplicationModel} "Success"
+// @Success 200 {object} response.SuccessModel{data=application_service.ApplicationUpdatedModel} "Success"
 // @Response 422 {object} response.ErrorModel{error=string} "Validation Error"
 // @Response 400 {object} response.ErrorModel "Bad Request"
 // @Failure 500 {object} response.ErrorModel "Server Error"
