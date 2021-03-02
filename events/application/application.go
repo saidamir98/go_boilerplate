@@ -37,11 +37,28 @@ func (s *Application) RegisterConsumers() {
 		s.createApplicationListener,
 	)
 
+	// it is replay consumer of "application.create"
 	s.rmq.AddConsumer(
 		"go_boilerplate.application.created", // consumerName
 		"application",                        // exchangeName
 		"application.created",                // queueName
 		"application.created",                // routingKey
 		s.applicationCreatedListener,
+	)
+
+	s.rmq.AddConsumer(
+		"go_boilerplate.application.update", // consumerName
+		"application",                       // exchangeName
+		"application.update",                // queueName
+		"application.update",                // routingKey
+		s.updateApplicationListener,
+	)
+
+	s.rmq.AddConsumer(
+		"go_boilerplate.application.delete", // consumerName
+		"application",                       // exchangeName
+		"application.delete",                // queueName
+		"application.delete",                // routingKey
+		s.deleteApplicationListener,
 	)
 }

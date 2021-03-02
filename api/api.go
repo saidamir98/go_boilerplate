@@ -6,6 +6,7 @@ import (
 	"go_boilerplate/config"
 	"go_boilerplate/pkg/cors"
 	"go_boilerplate/pkg/logger"
+	"go_boilerplate/pkg/pubsub"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -21,7 +22,7 @@ import (
 // @contact.name Saidamir Botirov
 // @contact.email saidamir.botirov@gmail.com
 // @contact.url https://www.linkedin.com/in/saidamir-botirov-a08559192
-func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*gin.Engine, error) {
+func New(cfg config.Config, log logger.Logger, db *sqlx.DB, rmq *pubsub.RMQ) (*gin.Engine, error) {
 	if cfg.Environment != "development" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -32,7 +33,7 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*gin.Engine, error)
 
 	router.Use(cors.MyCORSMiddleware())
 
-	handlerV1 := v1.New(cfg, log, db)
+	handlerV1 := v1.New(cfg, log, db, rmq)
 
 	router.GET("/ping", handlerV1.Ping)
 	router.GET("/config", handlerV1.GetConfig)

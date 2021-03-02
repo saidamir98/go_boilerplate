@@ -72,7 +72,7 @@ func main() {
 		log.Panic("error on the event server", logger.Error(err))
 	}
 
-	apiServer, err := api.New(cfg, log, db)
+	apiServer, err := api.New(cfg, log, db, pubsubServer.RMQ)
 	if err != nil {
 		log.Panic("error on the api server", logger.Error(err))
 	}
