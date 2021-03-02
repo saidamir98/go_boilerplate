@@ -604,6 +604,9 @@ var doc = `{
                 "app": {
                     "type": "string"
                 },
+                "basePath": {
+                    "type": "string"
+                },
                 "defaultLimit": {
                     "type": "string"
                 },
@@ -637,6 +640,9 @@ var doc = `{
                     "type": "string"
                 },
                 "rabbitURI": {
+                    "type": "string"
+                },
+                "serviceHost": {
                     "type": "string"
                 }
             }

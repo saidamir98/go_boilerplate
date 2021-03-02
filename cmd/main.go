@@ -22,7 +22,7 @@ func main() {
 	log := logger.New(cfg.App, cfg.LogLevel)
 
 	docs.SwaggerInfo.Host = cfg.ServiceHost + cfg.HTTPPort
-	docs.SwaggerInfo.BasePath = cfg.BasePath
+	// docs.SwaggerInfo.BasePath = cfg.BasePath
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	psqlConnString := fmt.Sprintf(

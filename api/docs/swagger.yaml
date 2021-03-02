@@ -50,6 +50,8 @@ definitions:
     properties:
       app:
         type: string
+      basePath:
+        type: string
       defaultLimit:
         type: string
       defaultOffset:
@@ -73,6 +75,8 @@ definitions:
       postgresUser:
         type: string
       rabbitURI:
+        type: string
+      serviceHost:
         type: string
     type: object
   response.ErrorModel:
