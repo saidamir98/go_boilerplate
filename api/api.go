@@ -10,9 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // New ...
@@ -35,20 +32,7 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB, rmq *pubsub.RMQ) (*g
 
 	handlerV1 := v1.New(cfg, log, db, rmq)
 
-	router.GET("/ping", handlerV1.Ping)
-	router.GET("/config", handlerV1.GetConfig)
-
-	url := ginSwagger.URL("/swagger/doc.json")
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
-	rv1 := router.Group("/v1")
-	{
-		rv1.POST("/application", handlerV1.CreateApplication)
-		rv1.GET("/application", handlerV1.GetApplicationList)
-		rv1.GET("/application/:id", handlerV1.GetApplicationByID)
-		rv1.PUT("/application/:id", handlerV1.UpdateApplication)
-		rv1.DELETE("/application/:id", handlerV1.DeleteApplication)
-	}
+	endpoints(router, handlerV1)
 
 	return router, nil
 }
