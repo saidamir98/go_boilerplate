@@ -29,6 +29,11 @@ definitions:
       body:
         type: string
     type: object
+  application_service.DeleteApplicationModel:
+    properties:
+      id:
+        type: string
+    type: object
   application_service.UpdateApplicationModel:
     properties:
       body:
@@ -267,7 +272,7 @@ paths:
             - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  type: integer
+                  $ref: '#/definitions/application_service.DeleteApplicationModel'
               type: object
         "400":
           description: Bad Request
@@ -359,7 +364,7 @@ paths:
             - $ref: '#/definitions/response.SuccessModel'
             - properties:
                 data:
-                  type: integer
+                  $ref: '#/definitions/application_service.UpdateApplicationModel'
               type: object
         "400":
           description: Bad Request

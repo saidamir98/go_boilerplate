@@ -409,7 +409,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "$ref": "#/definitions/application_service.UpdateApplicationModel"
                                         }
                                     }
                                 }
@@ -482,7 +482,7 @@ var doc = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "integer"
+                                            "$ref": "#/definitions/application_service.DeleteApplicationModel"
                                         }
                                     }
                                 }
@@ -567,6 +567,14 @@ var doc = `{
             "type": "object",
             "properties": {
                 "body": {
+                    "type": "string"
+                }
+            }
+        },
+        "application_service.DeleteApplicationModel": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }
