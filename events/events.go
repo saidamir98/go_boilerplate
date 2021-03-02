@@ -59,7 +59,6 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*PubsubServer, erro
 	// }()
 	// // <----------
 
-<<<<<<< HEAD
 	return &PubsubServer{
 		cfg: cfg,
 		log: log,
@@ -67,23 +66,6 @@ func New(cfg config.Config, log logger.Logger, db *sqlx.DB) (*PubsubServer, erro
 		RMQ: rmq,
 	}, nil
 }
-=======
-	rmq.AddConsumer(
-		"go_boilerplate", // ConsumerName: {consuming service}
-		"application",     // ExchangeName: model => exchange sending only events or commands about application
-		"application.event.created",    // QueueName: {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
-		"application.event.created",          // routingKey:  {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
-		applicationService.CreateApplicationListener,
-	)
-
-	rmq.AddConsumer(
-		"go_boilerplate", // ConsumerName: {consuming service}
-		"application",     // ExchangeName: model => exchange sending only events or commands about application
-		"application.event.updated",    // QueueName: {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
-		"application.event.updated",    // routingKey:  {model}.{type:(event|command)}.{event-name(model.actioned)|command(event-name)}
-		applicationService.UpdateApplicationListener,
-	)
->>>>>>> cc84aa670aea59a8827d78466b26456a9da6d02d
 
 // Run ...
 func (s *PubsubServer) Run(ctx context.Context) {
