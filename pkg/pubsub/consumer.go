@@ -3,7 +3,6 @@ package pubsub
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/streadway/amqp"
 )
@@ -104,8 +103,7 @@ func (c *Consumer) Start(ctx context.Context) {
 		select {
 		case msg, ok := <-c.messages:
 			if !ok {
-				// c.errors <- errors.New("error while reading consumer messages")
-				time.Sleep(time.Duration(5 * time.Second))
+				panic(errors.New("error while reading consumer messages"))
 			} else {
 				err := c.handler(msg)
 				if err != nil {
