@@ -3,6 +3,7 @@ module go_boilerplate
 go 1.15
 
 require (
+	github.com/MrWebUzb/goenv v0.0.0-20210721003620-b46127ff49f9 // indirect
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-openapi/spec v0.20.2 // indirect

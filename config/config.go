@@ -2,64 +2,44 @@ package config
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/joho/godotenv"
-	"github.com/spf13/cast"
+	"github.com/MrWebUzb/goenv"
 )
 
-// Config ...
+// Config configuration values loaded from .env
+// Environment equals one of the below values
+// development, staging, production
+// LogLevel equals one of the below values
+// debug, info, warn, error, dpanic, panic, fatal
 type Config struct {
-	App string
-
-	Environment string // development, staging, production
-
-	LogLevel string // debug, info, warn, error, dpanic, panic, fatal
-	HTTPPort string
-
-	DefaultOffset string
-	DefaultLimit  string
-
-	PostgresHost     string
-	PostgresPort     int
-	PostgresDatabase string
-	PostgresUser     string
-	PostgresPassword string
+	App              string `env:"APP" default:"example_app"`
+	Environment      string `env:"ENVIRONMENT" default:"development"`
+	LogLevel         string `env:"LOG_LEVEL" default:"debug"`
+	HTTPPort         string `env:"HTTP_PORT" default:":8080"`
+	DefaultOffset    string `env:"DEFAULT_OFFSET" default:"0"`
+	DefaultLimit     string `env:"DEFAULT_LIMIT" default:"20"`
+	PostgresHost     string `env:"POSTGRES_HOST" default:"localhost"`
+	PostgresPort     int    `env:"POSTGRES_PORT" default:"5432"`
+	PostgresDatabase string `env:"POSTGRES_DATABASE" default:"test"`
+	PostgresUser     string `env:"POSTGRES_USER" default:"test"`
+	PostgresPassword string `env:"POSTGRES_PASSWORD" default:"test"`
 }
 
 // Load ...
 func Load() Config {
-	if err := godotenv.Load(); err != nil {
-		fmt.Println("No .env file found")
+	env, err := goenv.New()
+
+	if err != nil {
+		fmt.Printf("could not load env variables: %v\n", err)
+		return Config{}
 	}
 
 	config := Config{}
 
-	config.App = cast.ToString(getOrReturnDefaultValue("PROJECT_NAME", "go_boilerplate"))
-
-	config.Environment = cast.ToString(getOrReturnDefaultValue("ENVIRONMENT", "development"))
-
-	config.LogLevel = cast.ToString(getOrReturnDefaultValue("LOG_LEVEL", "debug"))
-	config.HTTPPort = cast.ToString(getOrReturnDefaultValue("HTTP_PORT", ":7070"))
-
-	config.DefaultOffset = cast.ToString(getOrReturnDefaultValue("DEFAULT_OFFSET", "0"))
-	config.DefaultLimit = cast.ToString(getOrReturnDefaultValue("DEFAULT_LIMIT", "10"))
-
-	config.PostgresHost = cast.ToString(getOrReturnDefaultValue("POSTGRES_HOST", "localhost"))
-	config.PostgresPort = cast.ToInt(getOrReturnDefaultValue("POSTGRES_PORT", 5432))
-	config.PostgresDatabase = cast.ToString(getOrReturnDefaultValue("POSTGRES_DATABASE", "test"))
-	config.PostgresUser = cast.ToString(getOrReturnDefaultValue("POSTGRES_USER", "test"))
-	config.PostgresPassword = cast.ToString(getOrReturnDefaultValue("POSTGRES_PASSWORD", "test"))
-
-	return config
-}
-
-func getOrReturnDefaultValue(key string, defaultValue interface{}) interface{} {
-	_, exists := os.LookupEnv(key)
-
-	if exists {
-		return os.Getenv(key)
+	if err := env.Parse(&config); err != nil {
+		fmt.Printf("could not parse env variables: %v\n", err)
+		return Config{}
 	}
 
-	return defaultValue
+	return config
 }
