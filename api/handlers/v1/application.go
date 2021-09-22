@@ -95,6 +95,7 @@ func (h *Handler) GetApplicationList(c *gin.Context) {
 		h.handleErrorResponse(c, 400, "wrong offset input", err)
 		return
 	}
+
 	queryParam.Limit, err = h.parseLimitQueryParam(c)
 	if err != nil {
 		h.handleErrorResponse(c, 400, "wrong limit input", err)

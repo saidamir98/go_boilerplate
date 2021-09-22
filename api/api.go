@@ -21,7 +21,7 @@ import (
 // @description This is a Go Boilerplate for medium sized projects
 // @contact.name Saidamir Botirov
 // @contact.email saidamir.botirov@gmail.com
-// @contact.url https://www.linkedin.com/in/saidamir-botirov-a08559192
+// @contact.url https://www.linkedin.com/in/saidamir-botirov
 func New(cfg config.Config, log logger.Logger, db *sqlx.DB, rmq *pubsub.RMQ) (*gin.Engine, error) {
 	if cfg.Environment != "development" {
 		gin.SetMode(gin.ReleaseMode)

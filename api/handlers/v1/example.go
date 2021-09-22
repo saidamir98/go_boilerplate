@@ -35,7 +35,7 @@ func (h *Handler) Ping(c *gin.Context) {
 // @Success 200 {object} response.SuccessModel{data=config.Config} "desc"
 // @Response 400 {object} response.ErrorModel{error=string} "Bad Request"
 func (h *Handler) GetConfig(c *gin.Context) {
-	h.log.Info("get config", logger.Any("result", h.cfg))
+	h.log.Info("get config", logger.String("environment", h.cfg.Environment))
 	switch h.cfg.Environment {
 	case "development":
 		h.handleSuccessResponse(c, 200, "ok", h.cfg)
